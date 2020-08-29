@@ -2,12 +2,18 @@
   "name": "chiron/sirio",
   "description": "Sirio module",
   "type": "magento2-module",
-    "authors": [
+  "authors": [
+      {
+          "name": "Chiron",
+          "email": "support@chiron.ai",
+          "homepage": "https://chiron.ai",
+          "role": "Leader"
+      }
+  ],
+  "repositories": [
         {
-            "name": "Chiron",
-            "email": "support@chiron.ai",
-            "homepage": "https://chiron.ai",
-            "role": "Leader"
+            "type": "vcs",
+            "url": "https://github.com/Chiron-AI/Sirio-Magento2"
         }
     ],
   "repositories": [
