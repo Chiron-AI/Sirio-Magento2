@@ -11,12 +11,6 @@
       }
   ],
   "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/Chiron-AI/Sirio-Magento2"
-        }
-    ],
-  "repositories": [
     {
       "type": "vcs",
       "url": "https://github.com/Chiron-AI/Sirio-Magento2"
