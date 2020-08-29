@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="chiron" translate="label" sortOrder="400">
+            <label>Chiron</label>
+        </tab>
+        <section id="chiron" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Sirio</label>
+            <tab>chiron</tab>
+            <resource>Chiron_Sirio::config</resource>
+            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Setup</label>
+                <attribute type="expanded">1</attribute>
+                <field id="module_version" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Module Version</label>
+                    <frontend_model>Chiron\Sirio\Block\Adminhtml\System\Config\ModuleVersion</frontend_model>
+                </field>
+                <field id="iframe" translate="label" type="text" sortOrder="36" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Buy now your Sirio pack</label>
+                    <frontend_model>Chiron\Sirio\Block\Adminhtml\System\Config\Iframe</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

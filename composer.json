@@ -2,19 +2,19 @@
   "name": "chiron/sirio",
   "description": "Sirio module",
   "type": "magento2-module",
-  "authors": [
-    {
-      "name": "Mattia Zoccarato",
-      "email": "mattia.zoccarato@chiron.ai",
-      "homepage": "https://chiron.ai",
-      "role": "Leader"
-    }
-  ],
+    "authors": [
+        {
+            "name": "Chiron",
+            "email": "support@chiron.ai",
+            "homepage": "https://chiron.ai",
+            "role": "Leader"
+        }
+    ],
   "version": "0.0.1",
-  "license": [
-    "OSL-3.0",
-    "AFL-3.0"
-  ],
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
   "autoload": {
     "files": [
       "registration.php"
