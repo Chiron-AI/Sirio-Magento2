@@ -10,6 +10,12 @@
             "role": "Leader"
         }
     ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/Chiron-AI/Sirio-Magento2"
+    }
+  ],
   "version": "0.0.1",
     "license": [
         "OSL-3.0",
