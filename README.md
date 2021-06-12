@@ -1,6 +1,7 @@
 # Sirio Module M2
+## version 0.1.0
 
-## Installation
+### Installation
 
 The extension must be installed via `composer`. To proceed, run these commands in your terminal:
 
@@ -12,7 +13,7 @@ php bin/magento setup:di:compile
 php bin/magento setup:static-content:deploy -f
 ```
 
-## Update
+### Update
 
 To update the extension to the latest available version (depending on your `composer.json`), run these commands in your terminal:
 
@@ -23,7 +24,7 @@ php bin/magento setup:upgrade
 php bin/magento setup:static-content:deploy -f
 ```
 
-## Maintenance mode
+### Maintenance mode
 
 You may want to enable the maintenance mode when installing or updating the module, __especially when working on a production website__. To do so, run the two commands below before and after running the other setup commands:
 
