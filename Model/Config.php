@@ -67,6 +67,9 @@ class Config
      * @var LoggerInterface
      */
     private $logger;
+    
+    const XML_PATH_SIRIO_ENABLED = 'chiron/settings/enabled';
+    const XML_PATH_DEBUG_ENABLED = 'chiron/settings/debug_enabled';
 
     /**
      * @method __construct
@@ -141,19 +144,10 @@ class Config
     /**
      * @return boolean
      */
-    public function isEnabled($scopeId = null, $scope = null)
+    public function isEnabled($path, $scopeId = null, $scope = null)
     {
-        return ($this->getConfig(self::XML_PATH_YOTPO_ENABLED, $scopeId, $scope)) ? true : false;
+        return ($this->getConfig($path, $scopeId, $scope)) ? true : false;
     }
-
-    /**
-     * @return boolean
-     */
-    public function isDebugMode($scope = null, $scopeId = null)
-    {
-        return ($this->getConfig(self::XML_PATH_YOTPO_DEBUG_MODE_ENABLED, $scope, $scopeId)) ? true : false;
-    }
-
 
 
     /**
