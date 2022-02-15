@@ -56,7 +56,7 @@ class CartTrack extends Base
 			
 			/*
 					quando questa funzione viene chiamata:
-					metto in cart_new il carrello attuale
+					metto in sirio_cart il carrello attuale
 			*/
 			$products = array();
 			foreach($itemArray as $item){
@@ -69,10 +69,10 @@ class CartTrack extends Base
 				);
 			}
 			$cart_full = '{"cart_total":'.$total.', "cart_subtotal":'.$subtotal.', "shipping":'.$shipping.', "coupon_code":'.$coupon.', "discount_amount":'.$discount.', "cart_products":'.json_encode($products).'}';
-			if(isset($_COOKIE['cart_new'])){
-				setcookie('cart_new', "", 1);
+			if(isset($_COOKIE['sirio_cart'])){
+				setcookie('sirio_cart', "", 1);
 			}
-			setcookie('cart_new', base64_encode($cart_full), time() + (86400 * 30), "/");
+			setcookie('sirio_cart', base64_encode($cart_full), time() + (86400 * 30), "/");
 		} catch (\Exception $exception) {
 			$this->logError($exception->getMessage());
 		}

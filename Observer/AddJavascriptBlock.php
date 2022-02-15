@@ -209,8 +209,8 @@ class AddJavascriptBlock extends Base
 	}
 	
 	private function appendCheckoutSuccessJS() {
-		if(isset($_COOKIE['cart_new'])){
-			unset($_COOKIE['cart_new']);
+		if(isset($_COOKIE['sirio_cart'])){
+			unset($_COOKIE['sirio_cart']);
 		}
 		return
 		$this->getProfiling().'<script type="text/javascript">
@@ -222,8 +222,8 @@ class AddJavascriptBlock extends Base
 	}
 	
 	private function appendCheckoutFailureJS() {
-		if(isset($_COOKIE['cart_new'])){
-			setcookie('cart_new', "", 1);
+		if(isset($_COOKIE['sirio_cart'])){
+			setcookie('sirio_cart', "", 1);
 		}
 		return
 		$this->getProfiling().'<script type="text/javascript">
