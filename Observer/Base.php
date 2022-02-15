@@ -118,8 +118,12 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
 	 */
 	protected $query;
 	
+	protected $script = 'var sirioCustomObject = {};';
+
+    const SIRIO_URL_PRODUCTION = 'api.sirio.chiron.ai';
+    const SIRIO_URL_STAGE = 'api.sirio-stage.chiron.ai';
 	
-	
+    
 	
 	/**
      * Base constructor.
@@ -259,33 +263,75 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
 			)
 		);
 		
-		$script = 'var sirioCustomObject = {};
-	 				 sirioCustomObject.headers = '.json_encode($headers).';';
+		$this->script .= 'sirioCustomObject.headers = '.json_encode($headers).';';
 		
-		return $script;
+		
 	}
+
+    protected function getProfiling(){
+        return '<script type="text/javascript" src="'.$this->getSirioUrl().'/api/v1/profiling"></script>';
+    }
+
+    protected function getSirioUrl(){
+        return "https://".($this->getDebugMode()?self::SIRIO_URL_STAGE:self::SIRIO_URL_PRODUCTION);
+    }
+
+    protected function getDebugMode(){
+        return $this->isEnabled(SirioConfig::XML_PATH_DEV_MODE);
+    }
+
+
+    protected function getIpAddress(){
+        $ip = isset($_SERVER['HTTP_CLIENT_IP'])
+            ? $_SERVER['HTTP_CLIENT_IP']
+            : isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+                ? $_SERVER['HTTP_X_FORWARDED_FOR']
+                : $_SERVER['REMOTE_ADDR'];
+
+        $this->script.='sirioCustomObject.ip = \''.$ip.'\';';
+    }
+
+
+    protected function getCurrency(){
+        $currency_code = $this->storeConfig->getStore()->getCurrentCurrencyCode();
+        $this->script.='sirioCustomObject.currency = \''.$currency_code.'\';';
+    }
+
+    
+    protected function getLocale(){
+        $locale = strstr($this->locale->getLocale(), '_', true);
+        $this->script.='sirioCustomObject.locale = \''.$locale.'\';';
+    }
+
 	
-	
-	
-	protected function getLocale(){
-		$currentCode = $this->locale->getLocale();
-		return strstr($currentCode, '_', true);
-	}
-	
-	public function getLimit()
+	protected function getLimit()
 	{
 		return $this->sirioConfig->getConfig('catalog/frontend/grid_per_page');
 	}
-	
-	/**
-	 * @return string
-	 */
-	public function getCurrentCurrencyCode()
-	{
-		$currentCurrency = $this->storeConfig->getStore()->getCurrentCurrencyCode();
-		return $currentCurrency;
-	}
-	
+
+
+    protected function cleanTextProduct($string){
+        return  preg_replace('/\R/', '',
+            str_replace("<br/>","",
+                addslashes(
+                    str_replace("'\n''","",
+                        str_replace("'\r''","",
+                            str_replace("'\t''","",
+                                strip_tags(
+                                    trim($string))))))));
+    }
+    protected function cleanTextCategory($string){
+        return  preg_replace('/\R/', '',
+            str_replace("<br/>","",
+                addslashes(
+                    str_replace("'\n''","",
+                        str_replace("'\r''","",
+                            str_replace("'\t''","",
+                                strip_tags(
+                                    trim(($string)))))))));
+    }
+
+   
 	/**
 	 * @param $message
 	 */

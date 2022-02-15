@@ -70,6 +70,7 @@ class Config
     
     const XML_PATH_SIRIO_ENABLED = 'chiron/settings/enabled';
     const XML_PATH_DEBUG_ENABLED = 'chiron/settings/debug_enabled';
+    const XML_PATH_DEV_MODE = 'chiron/settings/dev_mode';
 
     /**
      * @method __construct
@@ -214,6 +215,8 @@ class Config
         }
         return $this->allStoreIds[$cacheKey];
     }
+
+   
 
     public function getModuleVersion()
     {

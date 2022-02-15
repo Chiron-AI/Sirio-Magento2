@@ -16,7 +16,8 @@ class AddJavascriptBlock extends Base
 	
 	protected $layout;
 	
-	const LAYOUT_BLOCK_NAME = 'head.additional';
+	const LAYOUT_BLOCK_NAME_FIRST = 'head.additional';
+	const LAYOUT_BLOCK_NAME_SECOND = 'after.body.start';
 	const SIRIO_REGISTRY_NAME = 'sirio_head';
 	
     /**
@@ -25,7 +26,7 @@ class AddJavascriptBlock extends Base
      * @param Observer $observer
      */
 	public function execute(Observer $observer)
-    {
+    {	
 		if ($this->registry->registry(self::SIRIO_REGISTRY_NAME)) {
 			return;
 		}
@@ -43,8 +44,16 @@ class AddJavascriptBlock extends Base
 			$blockContent = $this->createEvent($observer);
 			$block = $this->layout->createBlock('Magento\Framework\View\Element\Text');
 			$block->setText($blockContent);
-			$head = $this->layout->getBlock(self::LAYOUT_BLOCK_NAME);
-			$head->append($block);
+			$head = $this->layout->getBlock(self::LAYOUT_BLOCK_NAME_FIRST);
+			if($head){
+				$head->append($block);
+			}
+			else{
+				$head = $this->layout->getBlock(self::LAYOUT_BLOCK_NAME_SECOND);
+				if($head){
+					$head->append($block);
+				}
+			}
 						
         } catch (\Exception $exception) {
         	$this->logError($exception->getMessage());
@@ -58,8 +67,11 @@ class AddJavascriptBlock extends Base
 	 * @throws \Magento\Framework\Exception\LocalizedException
 	 */
 	public function getSirioEvent() {
-	
-		$this->headers = $this->getHeaders();
+		
+		$this->getHeaders();
+        $this->getIpAddress();
+        $this->getCurrency();
+        $this->getLocale();
 		
 		$route_name = $this->request->getRouteName();
 		$controller_name = $this->request->getControllerName();
@@ -92,57 +104,44 @@ class AddJavascriptBlock extends Base
  	}
 	
 	private function appendDefaultJS() {
-		$locale = $this->getLocale();
-		$currency_code = $this->getCurrentCurrencyCode();
 		return
-			'<script type="text/javascript">
+
+			$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
-                     '.$this->headers.'
-                     sirioCustomObject.locale = "'.$locale.'";
-                     sirioCustomObject.currency = "'.$currency_code.'";
+                     '.$this->script.'
                      //]]>
                  </script>';
 		
 	}
 
     private function appendHomeJS() {
-		$locale = $this->getLocale();
-		$currency_code = $this->getCurrentCurrencyCode();
 		return
-			'<script type="text/javascript">
+		$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
-                     '.$this->headers.'
+                     '.$this->script.'
                      sirioCustomObject.pageType = "home";
-                     sirioCustomObject.locale = "'.$locale.'";
-                     sirioCustomObject.currency = "'.$currency_code.'";
                      //]]>
                  </script>';
 		
 	}
 	private function appendProductJS() {
-		$locale = $this->getLocale();
-		$currency_code = $this->getCurrentCurrencyCode();
 		$current_product = $this->registry->registry('current_product');
 		return
-			'<script type="text/javascript">
+		$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
-                     '.$this->headers.'
-                     sirioCustomObject.productDetails = {"sku":"'.$current_product->getSku().'","name":"'.$current_product->getName().'","image":"'.$current_product->getImageUrl().'","description":"'.$current_product->getDescription().'","price":"'.$current_product->getPrice().'","special_price":"'.$current_product->getSpecialPrice().'"};
+                     '.$this->script.'
+                     sirioCustomObject.productDetails = {"sku":"'.$current_product->getSku().'","name":"'.$current_product->getName().'","image":"'.$current_product->getImageUrl().'","description":"'.$this->cleanTextProduct($current_product->getDescription()).'","price":"'.$current_product->getPrice().'","special_price":"'.$current_product->getSpecialPrice().'"};
                      sirioCustomObject.pageType = "product";
-                     sirioCustomObject.locale = "'.$locale.'";
-                     sirioCustomObject.currency = "'.$currency_code.'";
                      //]]>
                  </script>';
 	}
 	
 	private function appendProductCategoryJS() {
-		$locale = $this->getLocale();
 		$limit = $this->getLimit();
 		$page = $this->request->getParam('p')?$this->request->getParam('p'):1;
 		$current_category = $this->registry->registry('current_category');
 		$products_count = $limit;
 		$max_product_count = $current_category->getProductCount();
-		$currency_code = $this->getCurrentCurrencyCode();
 		
 		if($max_product_count % $limit > 0){
 			$pages = (int)($max_product_count / $limit) + 1 ;
@@ -155,27 +154,23 @@ class AddJavascriptBlock extends Base
 		}
 		
 		return
-			'<script type="text/javascript">
+		$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
-                     '.$this->headers.'
-                     sirioCustomObject.categoryDetails = {"name":"'.$current_category->getName().'","image":"'.$current_category->getImageUrl().'","description":"'.$current_category->getDescription().'"};
+                     '.$this->script.'
+                     sirioCustomObject.categoryDetails = {"name":"'.$current_category->getName().'","image":"'.$current_category->getImageUrl().'","description":"'.$this->cleanTextCategory($current_category->getDescription()).'"};
                      sirioCustomObject.pageType = "category";
                      sirioCustomObject.numProducts = '.$products_count.';
                      sirioCustomObject.pages = '.$pages.';
                      sirioCustomObject.currentPage = '.$page.';
-                     sirioCustomObject.locale = "'.$locale.'";
-                     sirioCustomObject.currency = "'.$currency_code.'";
                      //]]>
                  </script>';
 	}
 	
 	private function appendProductSearchJS() {
-		$locale = $this->getLocale();
 		$limit = $this->getLimit();
 		$page = $this->request->getParam('p')?$this->request->getParam('p'):1;
 		$products_count = $limit;
-		$max_product_count = $this->query->get()->getNumResults();;
-		$currency_code = $this->getCurrentCurrencyCode();
+		$max_product_count = $this->query->get()->getNumResults();
 		if($max_product_count % $limit > 0){
 			$pages = (int)($max_product_count / $limit) + 1 ;
 		}
@@ -185,16 +180,18 @@ class AddJavascriptBlock extends Base
 		if($page == $pages){
 			$products_count = $max_product_count % $limit;
 		}
+		if ($this->request->getParam('q')) {
+			$this->script.='sirioCustomObject.query = "' . $this->request->getParam('q') . '";';
+		}
 		return
-			'<script type="text/javascript">
+		$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
-                     '.$this->headers.'
+                     '.$this->script.'
+					 sirioCustomObject.numProducts = ' . $products_count_page . ';
                      sirioCustomObject.pageType = "search";
                      sirioCustomObject.numProducts = '.$products_count.';
                      sirioCustomObject.pages = '.$pages.';
                      sirioCustomObject.currentPage = '.$page.';
-                     sirioCustomObject.locale = "'.$locale.'";
-                     sirioCustomObject.currency = "'.$currency_code.'";
                      //]]>
                  </script>';
 	}
@@ -202,52 +199,41 @@ class AddJavascriptBlock extends Base
 	
 	private function appendCheckoutJS() {
 		
-		$locale = $this->getLocale();
-		$currency_code = $this->getCurrentCurrencyCode();
-		
 		return
-			'<script type="text/javascript">
+		$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
-                     '.$this->headers.'
+                     '.$this->script.'
                      sirioCustomObject.pageType = "checkout";
-                     sirioCustomObject.locale = "'.$locale.'";
-                     sirioCustomObject.currency = "'.$currency_code.'";
                      //]]>
                  </script>';
 	}
 	
 	private function appendCheckoutSuccessJS() {
-		$locale = $this->getLocale();
-		$currency_code = $this->getCurrentCurrencyCode();
 		if(isset($_COOKIE['cart_new'])){
 			unset($_COOKIE['cart_new']);
 		}
 		return
-			'<script type="text/javascript">
+		$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
-                     '.$this->headers.'
+                     '.$this->script.'
                      sirioCustomObject.pageType = "checkout_success";
-                     sirioCustomObject.locale = "'.$locale.'";
-                     sirioCustomObject.currency = "'.$currency_code.'";
                      //]]>
                  </script>';
 	}
 	
 	private function appendCheckoutFailureJS() {
-		$locale = $this->getLocale();
-		$currency_code = $this->getCurrentCurrencyCode();
 		if(isset($_COOKIE['cart_new'])){
 			setcookie('cart_new', "", 1);
 		}
 		return
-			'<script type="text/javascript">
+		$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
-                     '.$this->headers.'
+                     '.$this->script.'
                      sirioCustomObject.pageType = "checkout_failure";
-                     sirioCustomObject.locale = "'.$locale.'";
-                     sirioCustomObject.currency = "'.$currency_code.'";
                      //]]>
                  </script>';
 		
 	}
+
+	
 }
