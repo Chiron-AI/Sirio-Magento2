@@ -4,6 +4,10 @@
         <observer name="sirio_layout_render_before" instance="Chiron\Sirio\Observer\AddJavascriptBlock" />
     </event>
     <!--  Cart events  -->
+    
+    <event name="sales_quote_item_set_product">
+        <observer name="sirio_quote_item_set_product" instance="Chiron\Sirio\Observer\CartTrack" />
+    </event>
     <event name="sales_quote_save_after">
         <observer name="sirio_quote_save_after" instance="Chiron\Sirio\Observer\CartTrack" />
     </event>

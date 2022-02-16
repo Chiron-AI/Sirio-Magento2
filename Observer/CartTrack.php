@@ -20,17 +20,18 @@ class CartTrack extends Base
      */
     public function execute(Observer $observer)
     {
+
         if (!$this->isEnabled(SirioConfig::XML_PATH_SIRIO_ENABLED)) {
             return;
         }
         
         $this->observer = $observer;
         $this->observerType = $observer->getEvent()->getname();
-
+		
         try {
             $this->createEvent();
         } catch (\Exception $exception) {
-            $this->logError($exception->getMessage());
+			$this->logError($exception->getMessage());
             return;
         }
     }
@@ -41,7 +42,7 @@ class CartTrack extends Base
 	 * @throws \Magento\Framework\Exception\LocalizedException
 	 */
 	public function getSirioEvent() {
-	
+		
 		try {
 			
 			$cart = $this->getCart();
@@ -73,6 +74,7 @@ class CartTrack extends Base
 				setcookie('sirio_cart', "", 1);
 			}
 			setcookie('sirio_cart', base64_encode($cart_full), time() + (86400 * 30), "/");
+			
 		} catch (\Exception $exception) {
 			$this->logError($exception->getMessage());
 		}
