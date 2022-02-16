@@ -56,7 +56,7 @@ class AddJavascriptBlock extends Base
 			}
 						
         } catch (\Exception $exception) {
-        	$this->logError($exception->getMessage());
+			$this->logError($exception->getMessage());
             return;
         }
     }
@@ -141,7 +141,8 @@ class AddJavascriptBlock extends Base
 		$page = $this->request->getParam('p')?$this->request->getParam('p'):1;
 		$current_category = $this->registry->registry('current_category');
 		$products_count = $limit;
-		$max_product_count = $current_category->getProductCount();
+		$max_product_count = $current_category->getProductCollection()->count();
+		//$max_product_count = $current_category->getProductCount();
 		
 		if($max_product_count % $limit > 0){
 			$pages = (int)($max_product_count / $limit) + 1 ;
@@ -187,7 +188,6 @@ class AddJavascriptBlock extends Base
 		$this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
-					 sirioCustomObject.numProducts = ' . $products_count_page . ';
                      sirioCustomObject.pageType = "search";
                      sirioCustomObject.numProducts = '.$products_count.';
                      sirioCustomObject.pages = '.$pages.';
