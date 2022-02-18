@@ -117,12 +117,18 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
 	 * @var QueryFactory
 	 */
 	protected $query;
+
+    protected $state;
+
+    protected $quoteFactory;
 	
 	protected $script = 'var sirioCustomObject = {};';
 
     const SIRIO_URL_PRODUCTION = 'api.sirio.chiron.ai';
     const SIRIO_URL_STAGE = 'api.sirio-stage.chiron.ai';
-	
+	const AREA_CODE = \Magento\Framework\App\Area::AREA_ADMINHTML;
+
+    
     
 	
 	/**
@@ -156,7 +162,9 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
 		CurrencyFactory $currencyFactory,
 		RequestInterface $request,
 		Resolver $locale,
-		QueryFactory $query
+		QueryFactory $query,
+        \Magento\Framework\App\State $state,
+        \Magento\Quote\Model\QuoteFactory $quoteFactory
 	
     ) {
         $this->checkoutSession = $checkoutSession;
@@ -175,7 +183,15 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
 		$this->request = $request;
 		$this->locale = $locale;
 		$this->query = $query;
-		
+        $this->state = $state;
+		$this->quoteFactory = $quoteFactory;
+    }
+
+
+    protected function isAdmin()
+    {
+        $areaCode = $this->state->getAreaCode();
+        return $areaCode == self::AREA_CODE;
     }
 
     /**
@@ -183,8 +199,8 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
      * @return bool
      */
     protected function isEnabled($path)
-    {
-        return (bool) $this->sirioConfig->isEnabled($path);
+    {   
+        return !$this->isAdmin() && (bool) $this->sirioConfig->isEnabled($path);
     }
 
     protected function createEvent($observer = null)
@@ -194,6 +210,11 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
         }
         $this->eventList->set($this->observer);
         return $this->getSirioEvent();
+    }
+    
+    public function getQuote($quoteId)
+    {
+        return $this->quoteFactory->create()->load($quoteId);
     }
 
     /**
@@ -220,12 +241,15 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
         foreach ($items as $item) {
             if (!$item->getParentItem()) {
                 $data = [
+                    'item_id' => $item->getItemId(),
                     'title' => $item->getName(),
                     'price' => round($item->getBaseRowTotalInclTax()/$item->getQty(),2),
 					"sku"=>$item->getSku(),
-					"qty"=>round($item->getQty()),
+                    "product_options" => $item->getProductOptions(),
+                    "qty"=>round($item->getQty()),
 					"name"=>$item->getName(),
-					"discount_amount"=>$item->getBaseDiscountAmount()
+					"discount_amount"=>$item->getBaseDiscountAmount(),
+                    
                 ];
                 $itemArray [] = $data;
             }

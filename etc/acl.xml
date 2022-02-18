@@ -7,7 +7,7 @@
 					<resource id="Magento_Backend::stores_settings">
 						<resource id="Magento_Config::config">
                             <resource id="Chiron_Sirio::config" title="Sirio" translate="title" sortOrder="80">
-                                <resource id="Chiron_Sirio::config" title="Sirio Settings" translate="title" sortOrder="20" />
+                                <resource id="Chiron_Sirio::config_settings" title="Sirio Settings" translate="title" sortOrder="20" />
                             </resource>
 						</resource>
 					</resource>

@@ -5,13 +5,15 @@
     </event>
     <!--  Cart events  -->
     
-    <event name="sales_quote_item_set_product">
-        <observer name="sirio_quote_item_set_product" instance="Chiron\Sirio\Observer\CartTrack" />
+   <event name="sales_quote_item_qty_set_after">
+        <observer name="sirio_quote_item_qty_set_after" instance="Chiron\Sirio\Observer\CartTrack" />
     </event>
-    <event name="sales_quote_save_after">
-        <observer name="sirio_quote_save_after" instance="Chiron\Sirio\Observer\CartTrack" />
+    
+    <event name="checkout_cart_product_add_after">
+        <observer name="sirio_cart_product_add_after" instance="Chiron\Sirio\Observer\CartTrack" />
     </event>
-    <event name="sales_order_place_after">
-        <observer name="sirio_order_place_after" instance="Chiron\Sirio\Ocontroller_action_layout_render_beforebserver\CartTrack" />
+    <event name="sales_quote_remove_item">
+        <observer name="sirio_quote_remove_item" instance="Chiron\Sirio\Observer\CartTrack" />
     </event>
+
 </config>

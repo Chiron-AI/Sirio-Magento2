@@ -26,7 +26,7 @@ class AddJavascriptBlock extends Base
      * @param Observer $observer
      */
 	public function execute(Observer $observer)
-    {	
+    {		
 		if ($this->registry->registry(self::SIRIO_REGISTRY_NAME)) {
 			return;
 		}
@@ -104,9 +104,7 @@ class AddJavascriptBlock extends Base
  	}
 	
 	private function appendDefaultJS() {
-		return
-
-			$this->getProfiling().'<script type="text/javascript">
+		return $this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
                      //]]>
@@ -115,8 +113,7 @@ class AddJavascriptBlock extends Base
 	}
 
     private function appendHomeJS() {
-		return
-		$this->getProfiling().'<script type="text/javascript">
+		return $this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
                      sirioCustomObject.pageType = "home";
@@ -126,8 +123,7 @@ class AddJavascriptBlock extends Base
 	}
 	private function appendProductJS() {
 		$current_product = $this->registry->registry('current_product');
-		return
-		$this->getProfiling().'<script type="text/javascript">
+		return $this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
                      sirioCustomObject.productDetails = {"sku":"'.$current_product->getSku().'","name":"'.$current_product->getName().'","image":"'.$current_product->getImageUrl().'","description":"'.$this->cleanTextProduct($current_product->getDescription()).'","price":"'.$current_product->getPrice().'","special_price":"'.$current_product->getSpecialPrice().'"};
@@ -154,8 +150,7 @@ class AddJavascriptBlock extends Base
 			$products_count = $max_product_count % $limit;
 		}
 		
-		return
-		$this->getProfiling().'<script type="text/javascript">
+		return $this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
                      sirioCustomObject.categoryDetails = {"name":"'.$current_category->getName().'","image":"'.$current_category->getImageUrl().'","description":"'.$this->cleanTextCategory($current_category->getDescription()).'"};
@@ -184,8 +179,7 @@ class AddJavascriptBlock extends Base
 		if ($this->request->getParam('q')) {
 			$this->script.='sirioCustomObject.query = "' . $this->request->getParam('q') . '";';
 		}
-		return
-		$this->getProfiling().'<script type="text/javascript">
+		return $this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
                      sirioCustomObject.pageType = "search";
@@ -199,8 +193,7 @@ class AddJavascriptBlock extends Base
 	
 	private function appendCheckoutJS() {
 		
-		return
-		$this->getProfiling().'<script type="text/javascript">
+		return $this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
                      sirioCustomObject.pageType = "checkout";
@@ -212,8 +205,7 @@ class AddJavascriptBlock extends Base
 		if(isset($_COOKIE['sirio_cart'])){
 			unset($_COOKIE['sirio_cart']);
 		}
-		return
-		$this->getProfiling().'<script type="text/javascript">
+		return $this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
                      sirioCustomObject.pageType = "checkout_success";
@@ -225,8 +217,7 @@ class AddJavascriptBlock extends Base
 		if(isset($_COOKIE['sirio_cart'])){
 			setcookie('sirio_cart', "", 1);
 		}
-		return
-		$this->getProfiling().'<script type="text/javascript">
+		return $this->getProfiling().'<script type="text/javascript">
                      //<![CDATA[
                      '.$this->script.'
                      sirioCustomObject.pageType = "checkout_failure";

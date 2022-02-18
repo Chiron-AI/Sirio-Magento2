@@ -13,24 +13,30 @@ use Chiron\Sirio\Model\Config as SirioConfig;
 
 class CartTrack extends Base
 {
+	const SIRIO_REGISTRY_NAME = 'sirio_cart';
 
     /**
      *
      * @param Observer $observer
      */
     public function execute(Observer $observer)
-    {
-
-        if (!$this->isEnabled(SirioConfig::XML_PATH_SIRIO_ENABLED)) {
+    {	
+		if ($this->registry->registry(self::SIRIO_REGISTRY_NAME)) {
+			return;
+		}
+		
+		if (!$this->isEnabled(SirioConfig::XML_PATH_SIRIO_ENABLED)) {
             return;
         }
         
         $this->observer = $observer;
         $this->observerType = $observer->getEvent()->getname();
+		$this->registry->register(self::SIRIO_REGISTRY_NAME, true);
 		
         try {
-            $this->createEvent();
+			$this->createEvent();
         } catch (\Exception $exception) {
+			print_r($exception->getMessage());exit;
 			$this->logError($exception->getMessage());
             return;
         }
@@ -45,9 +51,16 @@ class CartTrack extends Base
 		
 		try {
 			
-			$cart = $this->getCart();
-			$items = $cart->getItems();
+			$quoteItem = $this->observer->getQuoteItem();
+			if($quoteItem==null){
+				$quoteItem = $this->observer->getItem();
+			}
+        	$cart = $quoteItem->getQuote();
+			
+			$items = $cart->getAllItems();
+
 			$itemArray = $this->makeItemArray($items);
+			
 			
 			$coupon = $cart->getCouponCode();
 			$shipping = $cart->getShippingAddress()->getBaseShippingInclTax();
@@ -61,21 +74,28 @@ class CartTrack extends Base
 			*/
 			$products = array();
 			foreach($itemArray as $item){
+				
 				$products[] = array(
+					"item_id"=>$item['item_id'],
 					"sku"=>$item['sku'] ,
+					"product_options"=>$item['product_options'],
 					"price"=>$item['price'],
 					"qty"=>$item['qty'],
 					"name"=>$item['name'],
 					"discount_amount"=>$item['discount_amount']
 				);
 			}
+
 			$cart_full = '{"cart_total":'.$total.', "cart_subtotal":'.$subtotal.', "shipping":'.$shipping.', "coupon_code":'.$coupon.', "discount_amount":'.$discount.', "cart_products":'.json_encode($products).'}';
 			if(isset($_COOKIE['sirio_cart'])){
 				setcookie('sirio_cart', "", 1);
 			}
 			setcookie('sirio_cart', base64_encode($cart_full), time() + (86400 * 30), "/");
 			
+			
+			
 		} catch (\Exception $exception) {
+			print_r($exception->getMessage());exit;
 			$this->logError($exception->getMessage());
 		}
 		return;
