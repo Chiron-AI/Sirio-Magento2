@@ -308,9 +308,9 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
     protected function getIpAddress(){
         $ip = isset($_SERVER['HTTP_CLIENT_IP'])
             ? $_SERVER['HTTP_CLIENT_IP']
-            : isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+            : (isset($_SERVER['HTTP_X_FORWARDED_FOR'])
                 ? $_SERVER['HTTP_X_FORWARDED_FOR']
-                : $_SERVER['REMOTE_ADDR'];
+                : $_SERVER['REMOTE_ADDR']);
 
         $this->script.='sirioCustomObject.ip = \''.$ip.'\';';
     }
