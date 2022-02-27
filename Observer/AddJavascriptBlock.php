@@ -37,16 +37,17 @@ class AddJavascriptBlock extends Base
 		
         $this->observer = $observer;
         $this->observerType = $observer->getEvent()->getName();
-		$this->registry->register(self::SIRIO_REGISTRY_NAME, true);
-        
-        try {
+		
+		try {
         	$this->layout = $observer->getLayout();
+			
 			$blockContent = $this->createEvent($observer);
 			$block = $this->layout->createBlock('Magento\Framework\View\Element\Text');
 			$block->setText($blockContent);
 			$head = $this->layout->getBlock(self::LAYOUT_BLOCK_NAME_FIRST);
 			if($head){
 				$head->append($block);
+				
 			}
 			else{
 				$head = $this->layout->getBlock(self::LAYOUT_BLOCK_NAME_SECOND);
@@ -54,6 +55,8 @@ class AddJavascriptBlock extends Base
 					$head->append($block);
 				}
 			}
+
+			$this->registry->register(self::SIRIO_REGISTRY_NAME, true);
 						
         } catch (\Exception $exception) {
 			$this->logError($exception->getMessage());
@@ -67,12 +70,12 @@ class AddJavascriptBlock extends Base
 	 * @throws \Magento\Framework\Exception\LocalizedException
 	 */
 	public function getSirioEvent() {
-		
 		$this->getHeaders();
         $this->getIpAddress();
         $this->getCurrency();
         $this->getLocale();
 		
+			
 		$route_name = $this->request->getRouteName();
 		$controller_name = $this->request->getControllerName();
 		$controller_action = $this->request->getActionName();

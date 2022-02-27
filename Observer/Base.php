@@ -164,7 +164,8 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
 		Resolver $locale,
 		QueryFactory $query,
         \Magento\Framework\App\State $state,
-        \Magento\Quote\Model\QuoteFactory $quoteFactory
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        \Magento\Framework\App\Response\RedirectInterface $redirect
 	
     ) {
         $this->checkoutSession = $checkoutSession;
@@ -185,6 +186,7 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
 		$this->query = $query;
         $this->state = $state;
 		$this->quoteFactory = $quoteFactory;
+        $this->redirect = $redirect;
     }
 
 
@@ -204,12 +206,15 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
     }
 
     protected function createEvent($observer = null)
-    {
+    {   
         if ($this->eventList->get()) {
             return;
         }
-        $this->eventList->set($this->observer);
-        return $this->getSirioEvent();
+        $data = $this->getSirioEvent();
+        if($data){
+            $this->eventList->set($this->observer);
+        }
+        return $data;
     }
     
     public function getQuote($quoteId)
@@ -365,6 +370,42 @@ abstract class Base implements \Magento\Framework\Event\ObserverInterface
 			$this->loggerInterface->error($message);
 		}
 	}
+
+    protected function getActionType(){
+        $actionType = "";
+        switch($this->observerType) {
+            case "customer_login":
+                $actionType = "login";
+                break;
+            case "checkout_cart_product_add_after":
+                $actionType = "addtocart";
+                break;
+            case "sales_quote_remove_item":
+                $actionType = "removefromcart";
+                break;
+            case "checkout_cart_update_items_before":
+                $actionType = "updatecart";
+                break;
+            /*case "":
+                $actionType = "changeqty";
+                break;  */
+            /*case "":
+                $actionType = "applycoupon";
+                break; */       
+            default:
+                break;
+        }
+
+        if(!$actionType){
+            if ($this->request->getFullActionName() == 'checkout_cart_index') {
+                $actionType = "viewcart";
+            }
+            if (!isset($_SERVER['HTTP_REFERER'])) {// !$actionType //!$this->redirect->getRefererUrl()
+                $actionType = "externallink";
+            }
+        }
+        return $actionType;
+    }
    
 
 }

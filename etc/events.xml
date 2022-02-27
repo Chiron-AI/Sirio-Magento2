@@ -1,12 +1,20 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="customer_login">
+        <observer name="sirio_customer_login" instance="Chiron\Sirio\Observer\CartTrack" />
+    </event>
     <event name="layout_generate_blocks_after">
-        <observer name="sirio_layout_render_before" instance="Chiron\Sirio\Observer\AddJavascriptBlock" />
+        <observer name="sirio_generate_blocks_after" instance="Chiron\Sirio\Observer\AddJavascriptBlock" />
     </event>
     <!--  Cart events  -->
+
     
-   <event name="sales_quote_item_qty_set_after">
-        <observer name="sirio_quote_item_qty_set_after" instance="Chiron\Sirio\Observer\CartTrack" />
+    <event name="layout_load_before">
+        <observer name="sirio_layout_load_before" instance="Chiron\Sirio\Observer\CartTrack" />
+    </event>
+    
+    <event name="checkout_cart_update_items_before">
+        <observer name="sirio_checkout_cart_update_items_before" instance="Chiron\Sirio\Observer\CartTrack" />
     </event>
     
     <event name="checkout_cart_product_add_after">

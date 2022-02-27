@@ -21,6 +21,10 @@ class CartTrack extends Base
      */
     public function execute(Observer $observer)
     {	
+		if(isset($_COOKIE['sirio_cart'])){
+			setcookie('sirio_cart', "", 1);
+		}
+
 		if ($this->registry->registry(self::SIRIO_REGISTRY_NAME)) {
 			return;
 		}
@@ -28,15 +32,21 @@ class CartTrack extends Base
 		if (!$this->isEnabled(SirioConfig::XML_PATH_SIRIO_ENABLED)) {
             return;
         }
-        
-        $this->observer = $observer;
+
+		
+		$this->observer = $observer;
         $this->observerType = $observer->getEvent()->getname();
 		$this->registry->register(self::SIRIO_REGISTRY_NAME, true);
 		
-        try {
+		if($this->observerType == 'layout_load_before'){
+			if(isset($_SERVER['HTTP_REFERER']) && !in_array($this->request->getFullActionName(), array('checkout_cart_index'))){
+				return;
+			}
+		}
+		
+		try {
 			$this->createEvent();
         } catch (\Exception $exception) {
-			print_r($exception->getMessage());exit;
 			$this->logError($exception->getMessage());
             return;
         }
@@ -54,8 +64,18 @@ class CartTrack extends Base
 			$quoteItem = $this->observer->getQuoteItem();
 			if($quoteItem==null){
 				$quoteItem = $this->observer->getItem();
+				if($quoteItem==null){
+					$cart = $this->getCart();
+				}
+				else{
+					$cart = $quoteItem->getQuote();
+				}
 			}
-        	$cart = $quoteItem->getQuote();
+			else{
+				$cart = $quoteItem->getQuote();
+			}
+			
+        	
 			
 			$items = $cart->getAllItems();
 
@@ -86,16 +106,13 @@ class CartTrack extends Base
 				);
 			}
 
-			$cart_full = '{"cart_total":'.$total.', "cart_subtotal":'.$subtotal.', "shipping":'.$shipping.', "coupon_code":'.$coupon.', "discount_amount":'.$discount.', "cart_products":'.json_encode($products).'}';
+			$cart_full = '{"action_type":"'.$this->getActionType().'","cart_total":'.$total.',"cart_subtotal":'.$subtotal.',"shipping":'.$shipping.',"coupon_code":"'.$coupon.'","discount_amount":'.$discount.',"cart_products":'.json_encode($products).'}';
 			if(isset($_COOKIE['sirio_cart'])){
 				setcookie('sirio_cart', "", 1);
 			}
 			setcookie('sirio_cart', base64_encode($cart_full), time() + (86400 * 30), "/");
 			
-			
-			
 		} catch (\Exception $exception) {
-			print_r($exception->getMessage());exit;
 			$this->logError($exception->getMessage());
 		}
 		return;
